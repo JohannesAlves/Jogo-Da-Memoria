@@ -3,32 +3,22 @@ const BACK = "card_back";
 const CARD = "card"
 const ICON = "icon";
 
-let techs =['bootstrap',
-'css',
-'electron',
-'firebase',
-'html',
-'javascript',
-'jquery',
-'mongo',
-'node',
-'react'];
 
-let cards = null;
+
 
 startGame();
 
 
 function startGame(){
-    cards = createCardsFromTechs(techs);
-    shuffleCards(cards);
-    initializeCards(cards);
+    
+    initializeCards(game.createCardsFromTechs());
 }
 
 function initializeCards(cards){
+
     let gameBoard = document.getElementById("gameBoard")
  
-        cards.forEach(card => {
+        game.cards.forEach(card => {
 
             let cardElement = document.createElement('div');
             cardElement.id = card.id;
@@ -74,59 +64,38 @@ function createCardFace(face, card, element){
 
 // Embaralhas as cartas
 
-function shuffleCards(cards){
-    let currentIndex = cards.length;
-    let randomIndex = 0;
-
-    while(currentIndex !== 0){
-
-        randomIndex = Math.floor(Math.random() * currentIndex)
-        currentIndex--;
-
-        [cards[randomIndex], cards[currentIndex]] = [cards[currentIndex], cards[randomIndex]]
-    }
-
-}
-
-// Criar cartas á partir das techs
-createCardsFromTechs(techs);
-function createCardsFromTechs(techs){
-
-    let cards = [];
-
-    techs.forEach((tech) => {
-        cards.push(createPairFromTech(tech)); 
-    })
-
-    return cards.flatMap(pair => pair);
-
-}
-
-// Par de cartas
-
-function createPairFromTech(tech){
-
-    return [{
-        id: createIdWithTech(tech),
-        icon: tech,
-        flipped: false,
-    }, {
-        id: createIdWithTech(tech),
-        icon: tech,
-        flipped: false,
-    }]
 
 
-}
-// Id criado com a intenção de saber qual carta está sendo clickada
-function createIdWithTech(tech){
-    return tech + parseInt(Math.random() *1000);
-}
+
 
 // função de virar a carta
 
 function flipCard(){
 
-    this.classList.add("flip");
+
+    if(game.setCard(this.id)){
+
+        this.classList.add("flip");
+        if(game.secondCard){
+        if(game.checkMatch()){
+            game.clearCards();
+            if(game.checkGameOver()){
+                let gameOverLayer = document.getElementById("gameOver");
+                gameOverLayer.style.display = 'flex';
+            }
+        }else{
+            setTimeout(()=>{
+            let firstCardView = document.getElementById(game.firstCard.id);
+            let secondCardView = document.getElementById(game.secondCard.id);
+
+            firstCardView.classList.remove('flip');
+            secondCardView.classList.remove('flip');
+            game.unflipCards();
+
+        }, 1000);
+
+    }
+}
+    }
 
 }
